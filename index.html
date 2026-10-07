@@ -126,9 +126,14 @@ select:focus{border-color:#75aef4;box-shadow:0 0 0 4px #eaf3ff}
 .css-panel{margin-top:22px;border:1px solid var(--line);border-radius:18px;background:#fbfcfe;overflow:hidden}
 .css-head{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:16px 18px;border-bottom:1px solid var(--line)}
 .css-head h3{margin:0;font-size:18px}.css-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.css-guide{
+  padding:12px 18px;background:#eef6ff;border-bottom:1px solid var(--line);font-size:13px;line-height:1.5;color:#1a4971;
+}
+.css-guide ol{margin:6px 0 0;padding-left:18px}
+.css-guide li{margin-bottom:3px}
 #copyCss{border:0;background:var(--blue);color:#fff;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
 #copyCss:hover{background:var(--blue-dark)}
-.css-code{margin:0;padding:18px;white-space:pre-wrap;word-break:break-word;overflow:auto;max-height:330px;background:#111827;color:#e5edf7;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}
+.css-code{margin:0;padding:18px;white-space:pre-wrap;word-break:break-word;overflow:auto;max-height:350px;background:#111827;color:#e5edf7;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}
 .copy-msg{padding:0 18px 12px;color:var(--ok);font-size:12px}
 .note{
   margin-top:20px;padding:15px 17px;background:#f6f8fa;border-radius:15px;color:#5d6b78;
@@ -224,13 +229,22 @@ footer{text-align:center;color:#7a8792;font-size:13px;padding:20px 8px}
       <div id="previewText" class="preview-text">বাংলা ফন্ট ফরম্যাট কনভার্টার • যুক্তবর্ণ পরীক্ষা করুন</div>
     </section>
 
+    <!-- CSS Setup Panel with Instructions -->
     <section id="cssPanel" class="css-panel" style="display:none">
       <div class="css-head">
         <div>
-          <h3>CSS Web Font Code</h3>
-          <p>এই code কপি করে আপনার website-এর CSS-এ ব্যবহার করতে পারবেন।</p>
+          <h3>CSS Web Font Setup Code</h3>
+          <p>ওয়েবসাইটে ফন্ট যুক্ত করার নির্দেশনাবলী ও CSS Code</p>
         </div>
         <button id="copyCss" type="button">Copy CSS</button>
+      </div>
+      <div class="css-guide">
+        <strong>💡 কিভাবে সেটিং করবেন:</strong>
+        <ol>
+          <li>ডাউনলোড করা ফন্ট ফাইলটি আপনার সার্ভার বা ওয়েবসাইটের <code>fonts/</code> ফোল্ডারে আপলোড করুন।</li>
+          <li>নিচের CSS Code-টি কপি করে আপনার CSS ফাইল বা HTML-এর <code>&lt;style&gt;</code> ট্যাগে বসিয়ে দিন।</li>
+          <li><code>url()</code> পাথটি আপনার সার্ভারের সঠিক ফাইল লোকেশন অনুযায়ী আপডেট করে নিন।</li>
+        </ol>
       </div>
       <pre id="cssCode" class="css-code"></pre>
       <div id="copyMsg" class="copy-msg"></div>
@@ -359,23 +373,28 @@ function makeCssCode(){
   const ext = format.value;
   const fontUrl = convertedName;
 
-  let src = `url("${fontUrl}") format("${ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext}")`;
-  return `@font-face {
+  let srcFormat = ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext;
+
+  return `/* Step 1: Upload '${fontUrl}' to your server (e.g. inside 'fonts/' folder) */
+
+@font-face {
   font-family: "${family}";
-  src: ${src};
+  src: url("fonts/${fontUrl}") format("${srcFormat}");
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 400;
   font-display: swap;
 }
 
-/* Example */
+/* Step 2: Apply the font to your website elements */
+
 body {
   font-family: "${family}", sans-serif;
 }
 
-/* HTML:
-<span class="my-font">বাংলা ফন্ট পরীক্ষা</span>
-*/`;
+/* Or use for a specific class: */
+.custom-font {
+  font-family: "${family}", sans-serif;
+}`;
 }
 
 function showCss(){
