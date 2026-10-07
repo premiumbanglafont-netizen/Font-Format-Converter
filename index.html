@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1877F2">
+<title>Font Converter</title>
+<style>
+:root{
+  --blue:#1877F2;
+  --blue-dark:#0d65d9;
+  --bg:#eef3f8;
+  --card:#fff;
+  --text:#17212b;
+  --muted:#687684;
+  --line:#dce4ec;
+  --soft:#f5f8fb;
+  --ok:#16834b;
+  --danger:#c62828;
+  --shadow:0 14px 40px rgba(25,55,90,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,"Segoe UI","Noto Sans Bengali",sans-serif;color:var(--text)}
+body{background:linear-gradient(180deg,#edf6ff 0,#f7f9fb 42%,#eef3f8 100%);padding:28px 14px}
+.app{width:min(980px,100%);margin:auto}
+.hero{
+  min-height:170px;border-radius:30px;background:linear-gradient(135deg,#1877F2 0%,#166fe5 55%,#0f63cc 100%);
+  color:#fff;padding:28px 34px;display:flex;align-items:center;gap:22px;position:relative;overflow:hidden;
+  box-shadow:0 18px 45px rgba(24,119,242,.25)
+}
+.hero:after{
+  content:"";position:absolute;width:280px;height:280px;border:28px solid rgba(255,255,255,.12);
+  border-radius:50%;right:-70px;top:-95px
+}
+.logo{
+  width:86px;height:86px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);
+  border-radius:24px;display:grid;place-items:center;flex:0 0 auto;backdrop-filter:blur(6px)
+}
+.logo svg{width:53px;height:53px}
+.hero h1{margin:0;font-size:clamp(28px,5vw,47px);font-weight:700;letter-spacing:-1px}
+.hero p{margin:7px 0 0;font-size:15px;opacity:.9}
+.card{
+  background:var(--card);border:1px solid rgba(22,45,70,.08);border-radius:30px;
+  box-shadow:var(--shadow);margin-top:24px;padding:28px
+}
+.drop{
+  border:2px dashed #a9c9ee;background:#f7fbff;border-radius:24px;min-height:285px;
+  display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;transition:.2s;padding:28px
+}
+.drop:hover,.drop.drag{border-color:var(--blue);background:#eef6ff;transform:translateY(-1px)}
+.upload-icon{
+  width:74px;height:74px;border-radius:50%;display:grid;place-items:center;margin:0 auto 15px;
+  color:var(--blue);background:#eaf3ff
+}
+.drop h2{margin:0 0 7px;font-size:27px}
+.drop p{margin:0;color:var(--muted);font-size:15px}
+.browse{
+  display:inline-block;margin-top:20px;background:#fff;border:2px solid #9fc5ef;color:var(--blue);
+  border-radius:15px;padding:13px 30px;font-weight:700;font-size:16px
+}
+#file{display:none}
+.file-info{display:none;margin-top:16px;padding:15px 17px;border-radius:15px;background:var(--soft);border:1px solid var(--line)}
+.file-info.show{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.file-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-meta{color:var(--muted);font-size:13px;margin-top:3px}
+.remove{border:0;background:#fff0f0;color:var(--danger);padding:8px 11px;border-radius:10px;cursor:pointer}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.field label{display:block;font-weight:700;margin:0 0 8px}
+select{
+  width:100%;height:50px;border:1px solid var(--line);border-radius:13px;background:#fff;
+  padding:0 13px;font-size:16px;color:var(--text);outline:none
+}
+select:focus{border-color:#75aef4;box-shadow:0 0 0 4px #eaf3ff}
+.action{
+  width:100%;margin-top:20px;height:58px;border:0;border-radius:17px;background:var(--blue);color:#fff;
+  font-size:19px;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(24,119,242,.22);transition:.2s
+}
+.action:hover{background:var(--blue-dark);transform:translateY(-1px)}
+.action:disabled{background:#a9c6e9;box-shadow:none;cursor:not-allowed;transform:none}
+.status{margin-top:18px;display:none;padding:14px 16px;border-radius:13px;font-size:14px;line-height:1.5}
+.status.show{display:block}
+.status.info{background:#eef6ff;color:#14579e}
+.status.ok{background:#ecf8f1;color:#11683d}
+.status.err{background:#fff0f0;color:#a42121}
+.preview{
+  display:none;margin-top:22px;border-top:1px solid var(--line);padding-top:22px
+}
+.preview.show{display:block}
+.preview-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.preview-head h3{margin:0;font-size:18px}
+.size{display:flex;align-items:center;gap:7px}
+.size button{border:1px solid var(--line);background:#fff;border-radius:9px;width:34px;height:32px;cursor:pointer}
+.preview-text{
+  min-height:125px;border:1px solid var(--line);border-radius:16px;padding:20px;background:#fbfcfd;
+  font-size:42px;line-height:1.6;overflow:auto
+}
+.css-panel{margin-top:22px;border:1px solid var(--line);border-radius:18px;background:#fbfcfe;overflow:hidden}
+.css-head{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.css-head h3{margin:0;font-size:18px}.css-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+#copyCss{border:0;background:var(--blue);color:#fff;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+#copyCss:hover{background:var(--blue-dark)}
+.css-code{margin:0;padding:18px;white-space:pre-wrap;word-break:break-word;overflow:auto;max-height:330px;background:#111827;color:#e5edf7;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}
+.copy-msg{padding:0 18px 12px;color:var(--ok);font-size:12px}
+.note{
+  margin-top:20px;padding:15px 17px;background:#f6f8fa;border-radius:15px;color:#5d6b78;
+  font-size:13px;line-height:1.6
+}
+footer{text-align:center;color:#7a8792;font-size:13px;padding:20px 8px}
+.spinner{display:inline-block;width:17px;height:17px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-3px;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:650px){
+  body{padding:12px 9px}.hero{padding:22px;border-radius:24px;min-height:135px}.logo{width:65px;height:65px;border-radius:19px}.logo svg{width:42px}
+  .hero h1{font-size:29px}.hero p{font-size:13px}.card{padding:16px;border-radius:23px}.drop{min-height:250px;padding:18px}.drop h2{font-size:22px}
+  .controls{grid-template-columns:1fr}.action{height:55px}.preview-text{font-size:31px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M17 23a20 20 0 0 1 33-5l4 4" stroke="white" stroke-width="5" stroke-linecap="round"/>
+        <path d="M54 13v10H44" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M47 41a20 20 0 0 1-33 5l-4-4" stroke="white" stroke-width="5" stroke-linecap="round"/>
+        <path d="M10 51V41h10" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div><h1>Font Converter</h1><p>TTF · OTF · WOFF · WOFF2</p></div>
+  </header>
+
+  <main class="card">
+    <div id="drop" class="drop">
+      <div>
+        <div class="upload-icon">
+          <svg width="39" height="39" viewBox="0 0 24 24" fill="none">
+            <path d="M12 16V4m0 0-4 4m4-4 4 4M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2>ফন্ট ফাইল এখানে দিন</h2>
+        <p>Drag & drop করুন অথবা নিচের বাটনে ক্লিক করুন</p>
+        <label class="browse" for="file">Browse File</label>
+        <input id="file" type="file" accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2">
+        <p style="margin-top:18px">সর্বোচ্চ ৩০ MB · TTF, OTF, WOFF, WOFF2</p>
+      </div>
+    </div>
+
+    <div id="fileInfo" class="file-info">
+      <div><div id="fileName" class="file-name"></div><div id="fileMeta" class="file-meta"></div></div>
+      <button id="remove" class="remove" type="button">Remove</button>
+    </div>
+
+    <div class="controls">
+      <div class="field">
+        <label for="format">Convert to</label>
+        <select id="format">
+          <option value="ttf">TTF — TrueType</option>
+          <option value="otf">OTF — OpenType</option>
+          <option value="woff">WOFF — Web Font</option>
+          <option value="woff2">WOFF2 — Web Font</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="sample">Preview text</label>
+        <select id="sample">
+          <option value="বাংলা ফন্ট কনভার্টার • যুক্তবর্ণ পরীক্ষা করুন">বাংলা + English</option>
+          <option value="আমার সোনার বাংলা। আমি তোমায় ভালোবাসি।">বাংলা</option>
+          <option value="The quick brown fox jumps over the lazy dog.">English</option>
+          <option value="Aa Bb Cc 0123456789">Latin + Numbers</option>
+        </select>
+      </div>
+    </div>
+
+    <button id="convert" class="action" disabled>Convert Font</button>
+    <div id="status" class="status"></div>
+
+    <section id="preview" class="preview">
+      <div class="preview-head">
+        <h3>Font Preview</h3>
+        <div class="size"><button id="minus" type="button">−</button><span id="sizeVal">42px</span><button id="plus" type="button">+</button></div>
+      </div>
+      <div id="previewText" class="preview-text">বাংলা ফন্ট কনভার্টার • যুক্তবর্ণ পরীক্ষা করুন</div>
+    </section>
+
+    <section id="cssPanel" class="css-panel" style="display:none">
+      <div class="css-head">
+        <div>
+          <h3>CSS Web Font Code</h3>
+          <p>এই code কপি করে আপনার website-এর CSS-এ ব্যবহার করতে পারবেন।</p>
+        </div>
+        <button id="copyCss" type="button">Copy CSS</button>
+      </div>
+      <pre id="cssCode" class="css-code"></pre>
+      <div id="copyMsg" class="copy-msg"></div>
+    </section>
+
+    <div class="note">
+      <strong>Privacy:</strong> ফাইলটি আপনার ডিভাইসেই প্রসেস হবে। কোনো server-এ font upload করা হবে না।
+      GitHub Pages-এ এই project public করা যাবে এবং সবাই ব্যবহার করতে পারবে।
+    </div>
+  </main>
+  <footer>Open-source browser font converter · GitHub Pages ready · CSS @font-face generator</footer>
+</div>
+
+<script>
+const MAX = 30 * 1024 * 1024;
+let selectedFile = null, fontBytes = null, pyodide = null, fonttoolsReady = false;
+let convertedBlob = null, convertedName = "", selectedSourceExt = "";
+let previewURL = null, previewSize = 42;
+
+const $ = id => document.getElementById(id);
+const drop = $("drop"), file = $("file"), convert = $("convert"), status = $("status");
+const format = $("format"), preview = $("preview"), previewText = $("previewText");
+
+function showStatus(msg, type="info"){
+  status.className = "status show " + type;
+  status.innerHTML = msg;
+}
+function clearStatus(){ status.className="status"; status.textContent=""; }
+
+function setFile(f){
+  clearStatus();
+  if(!f) return;
+  if(f.size > MAX){ showStatus("ফাইলটি ৩০ MB-এর বেশি। ছোট ফাইল নির্বাচন করুন।","err"); return; }
+  const ext = f.name.split(".").pop().toLowerCase();
+  if(!["ttf","otf","woff","woff2"].includes(ext)){ showStatus("শুধু TTF, OTF, WOFF বা WOFF2 ফাইল ব্যবহার করুন।","err"); return; }
+  selectedFile=f;
+  $("fileName").textContent=f.name;
+  $("fileMeta").textContent=`${ext.toUpperCase()} · ${(f.size/1024/1024).toFixed(2)} MB`;
+  $("fileInfo").classList.add("show");
+  convert.disabled=false;
+  previewFont(f);
+}
+function resetFile(){
+  selectedFile=null;fontBytes=null;
+  $("fileInfo").classList.remove("show");file.value="";
+  convert.disabled=true;preview.classList.remove("show");
+  if(previewURL) URL.revokeObjectURL(previewURL);
+  previewURL=null;clearStatus();
+}
+async function previewFont(f){
+  try{
+    if(previewURL) URL.revokeObjectURL(previewURL);
+    previewURL=URL.createObjectURL(f);
+    const face=new FontFace("UploadedPreview",`url(${previewURL})`);
+    await face.load(); document.fonts.add(face);
+    previewText.style.fontFamily="UploadedPreview";
+    preview.classList.add("show");
+  }catch(e){
+    preview.classList.remove("show");
+  }
+}
+drop.addEventListener("click",e=>{if(e.target.tagName!=="LABEL")file.click()});
+file.addEventListener("change",e=>setFile(e.target.files[0]));
+$("remove").addEventListener("click",resetFile);
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));
+drop.addEventListener("drop",e=>setFile(e.dataTransfer.files[0]));
+$("sample").addEventListener("change",e=>previewText.textContent=e.target.value);
+$("minus").addEventListener("click",()=>{previewSize=Math.max(16,previewSize-2);previewText.style.fontSize=previewSize+"px";$("sizeVal").textContent=previewSize+"px"});
+$("plus").addEventListener("click",()=>{previewSize=Math.min(100,previewSize+2);previewText.style.fontSize=previewSize+"px";$("sizeVal").textContent=previewSize+"px"});
+
+async function initFontTools(){
+  if(fonttoolsReady) return;
+  showStatus('<span class="spinner"></span>Converter engine প্রথমবার চালু হচ্ছে…');
+  try{
+    const script=document.createElement("script");
+    script.src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js";
+    document.head.appendChild(script);
+    await new Promise((res,rej)=>{script.onload=res;script.onerror=rej});
+    pyodide=await loadPyodide();
+    await pyodide.loadPackage("micropip");
+    await pyodide.runPythonAsync(`
+import micropip
+await micropip.install("fonttools")
+`);
+    fonttoolsReady=true;
+    showStatus("Converter engine প্রস্তুত। Convert Font চাপুন।","ok");
+  }catch(err){
+    console.error(err);
+    showStatus("Converter engine লোড করা যায়নি। Internet connection পরীক্ষা করে আবার চেষ্টা করুন।","err");
+    throw err;
+  }
+}
+
+function makeCssCode(){
+  if(!convertedName) return "";
+  const family = convertedName.replace(/\.[^.]+$/,"").replace(/["\\]/g,"");
+  const ext = format.value;
+  const mime = {ttf:"font/ttf",otf:"font/otf",woff:"font/woff",woff2:"font/woff2"}[ext];
+  const fontUrl = convertedName;
+
+  let src = `url("${fontUrl}") format("${ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext}")`;
+  return `@font-face {
+  font-family: "${family}";
+  src: ${src};
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* Example */
+body {
+  font-family: "${family}", sans-serif;
+}
+
+/* HTML:
+<span class="my-font">বাংলা ফন্ট পরীক্ষা</span>
+*/`;
+}
+
+function showCss(){
+  $("cssCode").textContent = makeCssCode();
+  $("cssPanel").style.display = "block";
+  $("copyMsg").textContent = "";
+}
+
+async function convertFont(){
+  if(!selectedFile) return;
+  convert.disabled=true;
+  convert.innerHTML='<span class="spinner"></span>Converting…';
+  $("cssPanel").style.display="none";
+
+  try{
+    if(!fonttoolsReady) await initFontTools();
+    fontBytes=new Uint8Array(await selectedFile.arrayBuffer());
+
+    const target=format.value;
+    const sourceExt=selectedFile.name.split(".").pop().toLowerCase();
+    selectedSourceExt=sourceExt;
+
+    pyodide.FS.writeFile("/inputfont",fontBytes);
+    pyodide.globals.set("target_ext",target);
+    pyodide.globals.set("source_ext",sourceExt);
+
+    const py = `
+from fontTools.ttLib import TTFont
+import os, traceback
+
+src="/inputfont"
+out="/outputfont"
+
+# FontTools reads TTF, OTF, WOFF and WOFF2 as OpenType font objects.
+# Saving with a different flavor handles the normal container conversions.
+font=TTFont(src, recalcBBoxes=False, recalcTimestamp=False)
+
+if target_ext == "woff":
+    font.flavor = "woff"
+elif target_ext == "woff2":
+    font.flavor = "woff2"
+elif target_ext in ("ttf","otf"):
+    # Both TTF and OTF can legally contain TrueType outlines.
+    # CFF/CFF2 remains CFF/CFF2 and therefore cannot be losslessly
+    # transformed into TrueType outlines just by changing the extension.
+    font.flavor = None
+else:
+    raise ValueError("Unsupported target format")
+
+font.save(out, reorderTables=False)
+len(open(out,"rb").read())
+`;
+    await pyodide.runPythonAsync(py);
+    const outBytes=pyodide.FS.readFile("/outputfont");
+
+    const base=selectedFile.name.replace(/\.[^.]+$/,"");
+    convertedName=base+"."+target;
+    const mime={ttf:"font/ttf",otf:"font/otf",woff:"font/woff",woff2:"font/woff2"}[target];
+    convertedBlob=new Blob([outBytes],{type:mime});
+
+    const url=URL.createObjectURL(convertedBlob);
+    const a=document.createElement("a");
+    a.href=url;a.download=convertedName;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+
+    showCss();
+    showStatus(`Conversion সফল। <strong>${convertedName}</strong> download শুরু হয়েছে। নিচে CSS Web Font code দেওয়া হয়েছে।`,"ok");
+  }catch(err){
+    console.error(err);
+    const msg=(err?.message||String(err)).replace(/^PythonError:\\s*/,"");
+    showStatus(`<strong>Conversion হয়নি:</strong> ${msg}<br><br>এই browser converter OpenType/TrueType font-এর supported container conversion করে। CFF/CFF2 outline-কে TrueType outline-এ বদলানো একটি আলাদা outline-conversion কাজ এবং সেটি lossless নয়।`,"err");
+  }finally{
+    convert.disabled=!selectedFile;
+    convert.textContent="Convert Font";
+  }
+}
+$("copyCss").addEventListener("click",async()=>{
+  const code=$("cssCode").textContent;
+  try{
+    await navigator.clipboard.writeText(code);
+    $("copyMsg").textContent="CSS code copied.";
+  }catch(e){
+    $("copyMsg").textContent="Copy করা যায়নি। Code block থেকে manually copy করুন।";
+  }
+});
+convert.addEventListener("click",convertFont);
+</script>
+</body>
+</html>
