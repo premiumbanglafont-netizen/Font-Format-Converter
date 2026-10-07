@@ -1,4 +1,4 @@
-# Font Converter
+# Font Format Converter
 
 Public GitHub Pages font converter with Facebook Blue UI.
 
