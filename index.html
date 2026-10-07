@@ -34,9 +34,10 @@ body{background:linear-gradient(180deg,#edf6ff 0,#f7f9fb 42%,#eef3f8 100%);paddi
 }
 .logo{
   width:86px;height:86px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);
-  border-radius:24px;display:grid;place-items:center;flex:0 0 auto;backdrop-filter:blur(6px)
+  border-radius:24px;display:grid;place-items:center;flex:0 0 auto;backdrop-filter:blur(6px);
+  overflow:hidden;
 }
-.logo svg{width:53px;height:53px}
+.logo img{width:100%;height:100%;object-fit:cover;border-radius:23px;}
 .hero h1{margin:0;font-size:clamp(28px,5vw,47px);font-weight:700;letter-spacing:-1px}
 .hero p{margin:7px 0 0;font-size:15px;opacity:.9}
 .card{
@@ -109,7 +110,7 @@ footer{text-align:center;color:#7a8792;font-size:13px;padding:20px 8px}
 .spinner{display:inline-block;width:17px;height:17px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-3px;margin-right:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:650px){
-  body{padding:12px 9px}.hero{padding:22px;border-radius:24px;min-height:135px}.logo{width:65px;height:65px;border-radius:19px}.logo svg{width:42px}
+  body{padding:12px 9px}.hero{padding:22px;border-radius:24px;min-height:135px}.logo{width:65px;height:65px;border-radius:19px}
   .hero h1{font-size:29px}.hero p{font-size:13px}.card{padding:16px;border-radius:23px}.drop{min-height:250px;padding:18px}.drop h2{font-size:22px}
   .controls{grid-template-columns:1fr}.action{height:55px}.preview-text{font-size:31px}
 }
@@ -118,13 +119,8 @@ footer{text-align:center;color:#7a8792;font-size:13px;padding:20px 8px}
 <body>
 <div class="app">
   <header class="hero">
-    <div class="logo" aria-hidden="true">
-      <svg viewBox="0 0 64 64" fill="none">
-        <path d="M17 23a20 20 0 0 1 33-5l4 4" stroke="white" stroke-width="5" stroke-linecap="round"/>
-        <path d="M54 13v10H44" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M47 41a20 20 0 0 1-33 5l-4-4" stroke="white" stroke-width="5" stroke-linecap="round"/>
-        <path d="M10 51V41h10" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+    <div class="logo">
+      <img src="logo.png" alt="Logo">
     </div>
     <div><h1>Font Converter</h1><p>TTF · OTF · WOFF · WOFF2</p></div>
   </header>
@@ -272,7 +268,7 @@ async function initFontTools(){
     await pyodide.loadPackage("micropip");
     await pyodide.runPythonAsync(`
 import micropip
-await micropip.install("fonttools")
+await micropip.install(["fonttools", "brotli"])
 `);
     fonttoolsReady=true;
     showStatus("Converter engine প্রস্তুত। Convert Font চাপুন।","ok");
@@ -287,7 +283,6 @@ function makeCssCode(){
   if(!convertedName) return "";
   const family = convertedName.replace(/\.[^.]+$/,"").replace(/["\\]/g,"");
   const ext = format.value;
-  const mime = {ttf:"font/ttf",otf:"font/otf",woff:"font/woff",woff2:"font/woff2"}[ext];
   const fontUrl = convertedName;
 
   let src = `url("${fontUrl}") format("${ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext}")`;
@@ -340,8 +335,6 @@ import os, traceback
 src="/inputfont"
 out="/outputfont"
 
-# FontTools reads TTF, OTF, WOFF and WOFF2 as OpenType font objects.
-# Saving with a different flavor handles the normal container conversions.
 font=TTFont(src, recalcBBoxes=False, recalcTimestamp=False)
 
 if target_ext == "woff":
@@ -349,9 +342,6 @@ if target_ext == "woff":
 elif target_ext == "woff2":
     font.flavor = "woff2"
 elif target_ext in ("ttf","otf"):
-    # Both TTF and OTF can legally contain TrueType outlines.
-    # CFF/CFF2 remains CFF/CFF2 and therefore cannot be losslessly
-    # transformed into TrueType outlines just by changing the extension.
     font.flavor = None
 else:
     raise ValueError("Unsupported target format")
