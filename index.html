@@ -1,515 +1,55 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#1877F2">
-<title>Font Format Converter</title>
-<style>
-:root{
-  --blue:#1877F2;
-  --blue-dark:#0d65d9;
-  --bg:#eef3f8;
-  --card:#fff;
-  --text:#17212b;
-  --muted:#687684;
-  --line:#dce4ec;
-  --soft:#f5f8fb;
-  --ok:#16834b;
-  --danger:#c62828;
-  --shadow:0 14px 40px rgba(25,55,90,.10);
-}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,"Segoe UI","Noto Sans Bengali",sans-serif;color:var(--text)}
-body{background:linear-gradient(180deg,#edf6ff 0,#f7f9fb 42%,#eef3f8 100%);padding:28px 14px}
-.app{width:min(980px,100%);margin:auto}
-
-/* Top Navigation Bar for Page Links */
-.nav-bar{
-  display:flex;justify-content:flex-end;gap:15px;margin-bottom:12px;padding:0 10px;
-}
-.nav-link{
-  color:var(--blue-dark);text-decoration:none;font-weight:600;font-size:14px;transition:.2s;
-  background:rgba(255,255,255,0.7);padding:6px 14px;border-radius:20px;border:1px solid #dce4ec;
-}
-.nav-link:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
-
-.hero{
-  min-height:170px;border-radius:30px;background:linear-gradient(135deg,#1877F2 0%,#166fe5 55%,#0f63cc 100%);
-  color:#fff;padding:28px 34px;display:flex;align-items:center;gap:22px;position:relative;overflow:hidden;
-  box-shadow:0 18px 45px rgba(24,119,242,.25)
-}
-.hero:after{
-  content:"";position:absolute;width:280px;height:280px;border:28px solid rgba(255,255,255,.12);
-  border-radius:50%;right:-70px;top:-95px
-}
-
-/* Round Shape Logo */
-.logo{
-  width:86px;height:86px;border:2px solid rgba(255,255,255,.8);background:rgba(255,255,255,.12);
-  border-radius:50%;display:grid;place-items:center;flex:0 0 auto;backdrop-filter:blur(6px);
-  overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.15);
-}
-.logo img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-
-.hero h1{margin:0;font-size:clamp(28px,5vw,47px);font-weight:700;letter-spacing:-1px}
-.hero p{margin:7px 0 0;font-size:15px;opacity:.9}
-.card{
-  background:var(--card);border:1px solid rgba(22,45,70,.08);border-radius:30px;
-  box-shadow:var(--shadow);margin-top:24px;padding:28px
-}
-.drop{
-  border:2px dashed #a9c9ee;background:#f7fbff;border-radius:24px;min-height:285px;
-  display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;transition:.2s;padding:28px
-}
-.drop:hover,.drop.drag{border-color:var(--blue);background:#eef6ff;transform:translateY(-1px)}
-.upload-icon{
-  width:74px;height:74px;border-radius:50%;display:grid;place-items:center;margin:0 auto 15px;
-  color:var(--blue);background:#eaf3ff
-}
-.drop h2{margin:0 0 7px;font-size:27px}
-.drop p{margin:0;color:var(--muted);font-size:15px}
-.browse{
-  display:inline-block;margin-top:20px;background:#fff;border:2px solid #9fc5ef;color:var(--blue);
-  border-radius:15px;padding:13px 30px;font-weight:700;font-size:16px
-}
-#file{display:none}
-.file-info{display:none;margin-top:16px;padding:15px 17px;border-radius:15px;background:var(--soft);border:1px solid var(--line)}
-.file-info.show{display:flex;justify-content:space-between;gap:12px;align-items:center}
-.file-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.file-meta{color:var(--muted);font-size:13px;margin-top:3px}
-.remove{border:0;background:#fff0f0;color:var(--danger);padding:8px 11px;border-radius:10px;cursor:pointer}
-.controls{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
-.field label{display:block;font-weight:700;margin:0 0 8px}
-select{
-  width:100%;height:50px;border:1px solid var(--line);border-radius:13px;background:#fff;
-  padding:0 13px;font-size:16px;color:var(--text);outline:none
-}
-select:focus{border-color:#75aef4;box-shadow:0 0 0 4px #eaf3ff}
-.action{
-  width:100%;margin-top:20px;height:58px;border:0;border-radius:17px;background:var(--blue);color:#fff;
-  font-size:19px;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(24,119,242,.22);transition:.2s
-}
-.action:hover{background:var(--blue-dark);transform:translateY(-1px)}
-.action:disabled{background:#a9c6e9;box-shadow:none;cursor:not-allowed;transform:none}
-
-.progress-box{display:none;margin-top:18px;background:#eef6ff;border:1px solid #b3d4fc;border-radius:14px;padding:14px}
-.progress-box.show{display:block}
-.progress-title{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--blue-dark);margin-bottom:8px}
-.progress-bar-bg{width:100%;height:10px;background:#d2e5f9;border-radius:10px;overflow:hidden}
-.progress-bar-fill{width:0%;height:100%;background:var(--blue);border-radius:10px;transition:width .3s ease}
-
-.download-btn{
-  display:none;width:100%;margin-top:15px;height:54px;border:0;border-radius:17px;background:var(--ok);color:#fff;
-  font-size:18px;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(22,131,75,.2);text-align:center;line-height:54px;text-decoration:none
-}
-.download-btn.show{display:block}
-.download-btn:hover{background:#116a3c}
-
-.status{margin-top:18px;display:none;padding:14px 16px;border-radius:13px;font-size:14px;line-height:1.5}
-.status.show{display:block}
-.status.info{background:#eef6ff;color:#14579e}
-.status.ok{background:#ecf8f1;color:#11683d}
-.status.err{background:#fff0f0;color:#a42121}
-.preview{
-  display:none;margin-top:22px;border-top:1px solid var(--line);padding-top:22px
-}
-.preview.show{display:block}
-.preview-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
-.preview-head h3{margin:0;font-size:18px}
-.size{display:flex;align-items:center;gap:7px}
-.size button{border:1px solid var(--line);background:#fff;border-radius:9px;width:34px;height:32px;cursor:pointer}
-.preview-text{
-  min-height:125px;border:1px solid var(--line);border-radius:16px;padding:20px;background:#fbfcfd;
-  font-size:42px;line-height:1.6;overflow:auto
-}
-.css-panel{margin-top:22px;border:1px solid var(--line);border-radius:18px;background:#fbfcfe;overflow:hidden}
-.css-head{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:16px 18px;border-bottom:1px solid var(--line)}
-.css-head h3{margin:0;font-size:18px}.css-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
-.css-guide{
-  padding:14px 18px;background:#eef6ff;border-bottom:1px solid var(--line);font-size:14px;line-height:1.6;color:#144a75;
-}
-.css-guide ol{margin:6px 0 0;padding-left:18px}
-.css-guide li{margin-bottom:4px}
-#copyCss{border:0;background:var(--blue);color:#fff;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;transition:.2s}
-#copyCss:hover{background:var(--blue-dark)}
-.css-code{margin:0;padding:18px;white-space:pre-wrap;word-break:break-word;overflow:auto;max-height:350px;background:#111827;color:#e5edf7;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}
-
-/* Message styling for copy notice */
-.copy-msg{
-  display:none;padding:10px 18px;color:var(--ok);background:#ecf8f1;font-size:14px;font-weight:600;border-top:1px solid #cce8d7;transition:.3s
-}
-.copy-msg.show{display:block}
-
-.note{
-  margin-top:20px;padding:15px 17px;background:#f6f8fa;border-radius:15px;color:#5d6b78;
-  font-size:13px;line-height:1.6
-}
-footer{text-align:center;color:#7a8792;font-size:13px;padding:20px 8px}
-.footer-links{margin-top:8px;display:flex;justify-content:center;gap:15px}
-.footer-links a{color:var(--blue);text-decoration:none;font-weight:600}
-.spinner{display:inline-block;width:17px;height:17px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-3px;margin-right:8px}
-@keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:650px){
-  body{padding:12px 9px}.hero{padding:22px;border-radius:24px;min-height:135px}.logo{width:65px;height:65px}
-  .hero h1{font-size:29px}.hero p{font-size:13px}.card{padding:16px;border-radius:23px}.drop{min-height:250px;padding:18px}.drop h2{font-size:22px}
-  .controls{grid-template-columns:1fr}.action{height:55px}.preview-text{font-size:31px}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unicode to Bijoy Converter</title>
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="config/css/tailwind.min.css">
+    <link rel="stylesheet" href="config/css/main.css">
 </head>
-<body>
-<div class="app">
-
-  <!-- Custom Page Links -->
-  <nav class="nav-bar">
-    <a href="https://example.com" class="nav-link" target="_blank">Home</a>
-    <a href="https://example.com/about" class="nav-link" target="_blank">About</a>
-    <a href="https://example.com/contact" class="nav-link" target="_blank">Contact</a>
-  </nav>
-
-  <header class="hero">
-    <div class="logo">
-      <img src="logo.png" alt="Logo">
-    </div>
-    <div><h1>Font Format Converter</h1><p>TTF · OTF · WOFF · WOFF2</p></div>
-  </header>
-
-  <main class="card">
-    <div id="drop" class="drop">
-      <div>
-        <div class="upload-icon">
-          <svg width="39" height="39" viewBox="0 0 24 24" fill="none">
-            <path d="M12 16V4m0 0-4 4m4-4 4 4M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-4 text-center">ইউনিকোড টু বিজয় কনভার্টার</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block font-medium mb-2">ইউনিকোড টেক্সট (Unicode):</label>
+                <textarea id="unicode_text" class="w-full h-40 p-2 border rounded-md" placeholder="এখানে ইউনিকোড টেক্সট লিখুন..."></textarea>
+            </div>
+            <div>
+                <label class="block font-medium mb-2">বিজয় টেক্সট (Bijoy):</label>
+                <textarea id="bijoy_text" class="w-full h-40 p-2 border rounded-md" placeholder="এখানে বিজয় আউটপুট আসবে..."></textarea>
+            </div>
         </div>
-        <h2>ফন্ট ফাইল এখানে দিন</h2>
-        <p>Drag & drop করুন অথবা নিচের বাটনে ক্লিক করুন</p>
-        <label class="browse" for="file">Browse File</label>
-        <input id="file" type="file" accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2">
-        <p style="margin-top:18px">সর্বোচ্চ ৩০ MB · TTF, OTF, WOFF, WOFF2</p>
-      </div>
-    </div>
 
-    <div id="fileInfo" class="file-info">
-      <div><div id="fileName" class="file-name"></div><div id="fileMeta" class="file-meta"></div></div>
-      <button id="remove" class="remove" type="button">Remove</button>
-    </div>
-
-    <div class="controls">
-      <div class="field">
-        <label for="format">Convert to</label>
-        <select id="format">
-          <option value="ttf">TTF — TrueType</option>
-          <option value="otf">OTF — OpenType</option>
-          <option value="woff">WOFF — Web Font</option>
-          <option value="woff2">WOFF2 — Web Font</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="sample">Preview text</label>
-        <select id="sample">
-          <option value="বাংলা ফন্ট ফরম্যাট কনভার্টার • যুক্তবর্ণ পরীক্ষা করুন">বাংলা + English</option>
-          <option value="আমার সোনার বাংলা। আমি তোমায় ভালোবাসি।">বাংলা</option>
-          <option value="The quick brown fox jumps over the lazy dog.">English</option>
-          <option value="Aa Bb Cc 0123456789">Latin + Numbers</option>
-        </select>
-      </div>
-    </div>
-
-    <button id="convert" class="action" disabled>Convert Font</button>
-
-    <div id="progressBox" class="progress-box">
-      <div class="progress-title"><span id="progressText">Processing...</span><span id="progressPercent">0%</span></div>
-      <div class="progress-bar-bg"><div id="progressBarFill" class="progress-bar-fill"></div></div>
-    </div>
-
-    <a id="downloadBtn" class="download-btn" href="#" download="">Download Converted Font</a>
-
-    <div id="status" class="status"></div>
-
-    <section id="preview" class="preview">
-      <div class="preview-head">
-        <h3>Font Preview</h3>
-        <div class="size"><button id="minus" type="button">−</button><span id="sizeVal">42px</span><button id="plus" type="button">+</button></div>
-      </div>
-      <div id="previewText" class="preview-text">বাংলা ফন্ট ফরম্যাট কনভার্টার • যুক্তবর্ণ পরীক্ষা করুন</div>
-    </section>
-
-    <!-- Bangla Instruction CSS Panel -->
-    <section id="cssPanel" class="css-panel" style="display:none">
-      <div class="css-head">
-        <div>
-          <h3>CSS Web Font Setup Code</h3>
-          <p>ওয়েবসাইটে ফন্ট যুক্ত করার নির্দেশনাবলী ও CSS Code</p>
+        <div class="mt-4 flex gap-3 justify-center">
+            <button id="convert_btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">কনভার্ট করুন</button>
+            <button id="clear_btn" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">ক্লিয়ার</button>
         </div>
-        <button id="copyCss" type="button">Copy CSS</button>
-      </div>
-      <div class="css-guide">
-        <strong>💡 ওয়েবসাইটে ফন্ট সেটআপ করার সহজ নিয়ম:</strong>
-        <ol>
-          <li>কনভার্ট করা ফন্ট ফাইলটি ডাউনলোড করে আপনার ওয়েব সার্ভারের (যেমন: <code>fonts/</code>) ফোল্ডারে আপলোড করুন।</li>
-          <li>নিচের CSS Code-টি কপি করে আপনার ওয়েবসাইটের CSS ফাইলের একদম উপরে যুক্ত করে দিন।</li>
-          <li><code>url("fonts/...")</code> অংশে আপনার ফন্ট ফাইলের সঠিক লিংক/পাথ বসিয়ে দিন।</li>
-        </ol>
-      </div>
-      <pre id="cssCode" class="css-code"></pre>
-      <div id="copyMsg" class="copy-msg"></div>
-    </section>
-
-    <div class="note">
-      <strong>Privacy:</strong> ফাইলটি আপনার ডিভাইসেই প্রসেস হবে। কোনো server-এ font upload করা হবে না
-      এবং সবাই ব্যবহার করতে পারবে।
     </div>
-  </main>
-  
-  <footer>
-    PBFF font format converter · CSS @font-face generator · আপনার ব্রাউজারে স্থায়ী ভাবে চলে
-    <div class="footer-links">
-      <a href="https://example.com/privacy" target="_blank">Privacy Policy</a> ·
-      <a href="https://example.com/terms" target="_blank">Terms</a>
-    </div>
-  </footer>
-</div>
 
-<script>
-const MAX = 30 * 1024 * 1024;
-let selectedFile = null, fontBytes = null, pyodide = null, fonttoolsReady = false;
-let convertedBlob = null, convertedName = "", selectedSourceExt = "";
-let previewURL = null, previewSize = 42;
+    <!-- JS Files -->
+    <script src="config/js/unicode.js"></script>
+    <script src="config/js/bijoy.js"></script>
 
-const $ = id => document.getElementById(id);
-const drop = $("drop"), file = $("file"), convert = $("convert"), status = $("status");
-const format = $("format"), preview = $("preview"), previewText = $("previewText");
-const downloadBtn = $("downloadBtn"), progressBox = $("progressBox");
-const progressBarFill = $("progressBarFill"), progressPercent = $("progressPercent"), progressText = $("progressText");
+    <!-- Custom Script for Conversion -->
+    <script>
+        document.getElementById('convert_btn').addEventListener('click', function() {
+            var src = document.getElementById('unicode_text').value;
+            if (typeof convertUnicodeToBijoy === 'function') {
+                document.getElementById('bijoy_text').value = convertUnicodeToBijoy(src);
+            } else if (typeof UnicodetoBijoy === 'function') {
+                document.getElementById('bijoy_text').value = UnicodetoBijoy(src);
+            } else {
+                alert('Conversion function not found!');
+            }
+        });
 
-function showStatus(msg, type="info"){
-  status.className = "status show " + type;
-  status.innerHTML = msg;
-}
-function clearStatus(){ status.className="status"; status.textContent=""; }
-
-function setProgress(percent, text){
-  progressBox.classList.add("show");
-  progressBarFill.style.width = percent + "%";
-  progressPercent.textContent = percent + "%";
-  if(text) progressText.textContent = text;
-}
-function hideProgress(){ progressBox.classList.remove("show"); }
-
-function setFile(f){
-  clearStatus();
-  downloadBtn.classList.remove("show");
-  if(!f) return;
-  if(f.size > MAX){ showStatus("ফাইলটি ৩০ MB-এর বেশি। ছোট ফাইল নির্বাচন করুন।","err"); return; }
-  const ext = f.name.split(".").pop().toLowerCase();
-  if(!["ttf","otf","woff","woff2"].includes(ext)){ showStatus("শুধু TTF, OTF, WOFF বা WOFF2 ফাইল ব্যবহার করুন।","err"); return; }
-  selectedFile=f;
-  $("fileName").textContent=f.name;
-  $("fileMeta").textContent=`${ext.toUpperCase()} · ${(f.size/1024/1024).toFixed(2)} MB`;
-  $("fileInfo").classList.add("show");
-  convert.disabled=false;
-  previewFont(f, "UploadedPreview");
-}
-
-function resetFile(){
-  selectedFile=null;fontBytes=null;
-  $("fileInfo").classList.remove("show");file.value="";
-  convert.disabled=true;preview.classList.remove("show");
-  downloadBtn.classList.remove("show");
-  hideProgress();
-  if(previewURL) URL.revokeObjectURL(previewURL);
-  previewURL=null;clearStatus();
-}
-
-async function previewFont(fOrBlob, fontName="ConvertedPreview"){
-  try{
-    if(previewURL) URL.revokeObjectURL(previewURL);
-    previewURL=URL.createObjectURL(fOrBlob);
-    const face=new FontFace(fontName,`url(${previewURL})`);
-    await face.load(); document.fonts.add(face);
-    previewText.style.fontFamily=fontName;
-    preview.classList.add("show");
-  }catch(e){
-    console.error("Preview load failed:", e);
-    preview.classList.remove("show");
-  }
-}
-
-drop.addEventListener("click",e=>{if(e.target.tagName!=="LABEL")file.click()});
-file.addEventListener("change",e=>setFile(e.target.files[0]));
-$("remove").addEventListener("click",resetFile);
-["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));
-["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));
-drop.addEventListener("drop",e=>setFile(e.dataTransfer.files[0]));
-$("sample").addEventListener("change",e=>previewText.textContent=e.target.value);
-$("minus").addEventListener("click",()=>{previewSize=Math.max(16,previewSize-2);previewText.style.fontSize=previewSize+"px";$("sizeVal").textContent=previewSize+"px"});
-$("plus").addEventListener("click",()=>{previewSize=Math.min(100,previewSize+2);previewText.style.fontSize=previewSize+"px";$("sizeVal").textContent=previewSize+"px"});
-
-async function initFontTools(){
-  if(fonttoolsReady) return;
-  setProgress(15, "Engine loading...");
-  try{
-    const script=document.createElement("script");
-    script.src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js";
-    document.head.appendChild(script);
-    await new Promise((res,rej)=>{script.onload=res;script.onerror=rej});
-    setProgress(40, "Pyodide loaded...");
-    pyodide=await loadPyodide();
-    setProgress(65, "Installing font modules...");
-    await pyodide.loadPackage("micropip");
-    await pyodide.runPythonAsync(`
-import micropip
-await micropip.install(["fonttools", "brotli"])
-`);
-    fonttoolsReady=true;
-    setProgress(100, "Ready!");
-    setTimeout(hideProgress, 800);
-  }catch(err){
-    console.error(err);
-    hideProgress();
-    showStatus("Converter engine লোড করা যায়নি। Internet connection পরীক্ষা করে আবার চেষ্টা করুন।","err");
-    throw err;
-  }
-}
-
-/* Bangla Comments inside Generated CSS */
-function makeCssCode(){
-  if(!convertedName) return "";
-  const family = convertedName.replace(/\.[^.]+$/,"").replace(/["\\]/g,"");
-  const ext = format.value;
-  const fontUrl = convertedName;
-
-  let srcFormat = ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext;
-
-  return `/* ধাপ ১: '${fontUrl}' ফাইলটি আপনার সার্ভারের 'fonts/' ফোল্ডারে আপলোড করুন */
-
-@font-face {
-  font-family: "${family}";
-  src: url("fonts/${fontUrl}") format("${srcFormat}");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
-/* ধাপ ২: আপনার ওয়েবসাইটের টেক্সটে ফন্টটি ব্যবহার করুন */
-
-body {
-  font-family: "${family}", sans-serif;
-}
-
-/* নির্দিষ্ট কোনো ক্লাসের জন্য ব্যবহার করতে চাইলে: */
-.custom-font {
-  font-family: "${family}", sans-serif;
-}`;
-}
-
-function showCss(){
-  $("cssCode").textContent = makeCssCode();
-  $("cssPanel").style.display = "block";
-  const msg = $("copyMsg");
-  msg.className = "copy-msg";
-  msg.textContent = "";
-}
-
-async function convertFont(){
-  if(!selectedFile) return;
-  convert.disabled=true;
-  downloadBtn.classList.remove("show");
-  convert.innerHTML='<span class="spinner"></span>Converting…';
-  $("cssPanel").style.display="none";
-
-  try{
-    if(!fonttoolsReady) await initFontTools();
-    
-    setProgress(20, "File reading...");
-    fontBytes=new Uint8Array(await selectedFile.arrayBuffer());
-
-    const target=format.value;
-    const sourceExt=selectedFile.name.split(".").pop().toLowerCase();
-    selectedSourceExt=sourceExt;
-
-    setProgress(50, "Converting font...");
-    pyodide.FS.writeFile("/inputfont",fontBytes);
-    pyodide.globals.set("target_ext",target);
-    pyodide.globals.set("source_ext",sourceExt);
-
-    const py = `
-from fontTools.ttLib import TTFont
-import os, traceback
-
-src="/inputfont"
-out="/outputfont"
-
-font=TTFont(src, recalcBBoxes=False, recalcTimestamp=False)
-
-if target_ext == "woff":
-    font.flavor = "woff"
-elif target_ext == "woff2":
-    font.flavor = "woff2"
-elif target_ext in ("ttf","otf"):
-    font.flavor = None
-else:
-    raise ValueError("Unsupported target format")
-
-font.save(out, reorderTables=False)
-len(open(out,"rb").read())
-`;
-    await pyodide.runPythonAsync(py);
-    setProgress(85, "Generating output...");
-    const outBytes=pyodide.FS.readFile("/outputfont");
-
-    const base=selectedFile.name.replace(/\.[^.]+$/,"");
-    convertedName=base+"."+target;
-    const mime={ttf:"font/ttf",otf:"font/otf",woff:"font/woff",woff2:"font/woff2"}[target];
-    convertedBlob=new Blob([outBytes],{type:mime});
-
-    const downloadUrl = URL.createObjectURL(convertedBlob);
-    downloadBtn.href = downloadUrl;
-    downloadBtn.download = convertedName;
-    downloadBtn.classList.add("show");
-
-    await previewFont(convertedBlob, "ConvertedPreview");
-
-    setProgress(100, "Conversion Complete!");
-    setTimeout(hideProgress, 1000);
-
-    showCss();
-    showStatus(`Conversion সফল! <strong>${convertedName}</strong> প্রস্তুত। নিচের <strong>Download Font</strong> বাটনে ক্লিক করে ডাউনলোড করুন।`,"ok");
-  }catch(err){
-    console.error(err);
-    hideProgress();
-    const msg=(err?.message||String(err)).replace(/^PythonError:\\s*/,"");
-    showStatus(`<strong>Conversion হয়নি:</strong> ${msg}<br><br>এই browser converter OpenType/TrueType font-এর supported container conversion করে। CFF/CFF2 outline-কে TrueType outline-এ বদলানো একটি আলাদা outline-conversion কাজ এবং সেটি lossless নয়।`,"err");
-  }finally{
-    convert.disabled=!selectedFile;
-    convert.textContent="Convert Font";
-  }
-}
-
-/* Copy button click listener with display animation */
-$("copyCss").addEventListener("click", async () => {
-  const code = $("cssCode").textContent;
-  const copyBtn = $("copyCss");
-  const msgBox = $("copyMsg");
-
-  try {
-    await navigator.clipboard.writeText(code);
-    copyBtn.textContent = "Copied!";
-    msgBox.textContent = "✓ CSS code সফলভাবে কপি হয়েছে!";
-    msgBox.classList.add("show");
-
-    setTimeout(() => {
-      copyBtn.textContent = "Copy CSS";
-      msgBox.classList.remove("show");
-    }, 3000);
-  } catch (e) {
-    msgBox.textContent = "⚠️ Copy করা যায়নি। Code block থেকে manually copy করুন।";
-    msgBox.classList.add("show");
-  }
-});
-
-convert.addEventListener("click",convertFont);
-</script>
+        document.getElementById('clear_btn').addEventListener('click', function() {
+            document.getElementById('unicode_text').value = '';
+            document.getElementById('bijoy_text').value = '';
+        });
+    </script>
 </body>
 </html>
