@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unicode to Bijoy Converter</title>
-    <!-- CSS Files -->
     <link rel="stylesheet" href="config/css/tailwind.min.css">
     <link rel="stylesheet" href="config/css/main.css">
 </head>
@@ -29,39 +28,55 @@
         </div>
     </div>
 
-    <!-- JS Files from your Zip -->
-    <script src="config/js/unicode.js"></script>
-    <script src="config/js/bijoy.js"></script>
-
-    <!-- Custom Direct Working Logic -->
+    <!-- Inline Conversion Logic -->
     <script>
-        function processConversion() {
-            var srcText = document.getElementById('unicode_text').value;
-            var bijoyOutput = '';
+        function convertUnicodeToBijoy(src) {
+            if (!src) return '';
+            
+            // Map table
+            var map = {
+                'অ': 'A', 'আ': 'Av', 'ই': 'Bi', 'ঈ': 'B', 'উ': 'C', 'ঊ': 'D', 'ঋ': 'E', 'এ': 'G', 'ঐ': 'H', 'ও': 'I', 'ঔ': 'J',
+                'ক': 'K', 'খ': 'L', 'গ': 'M', 'ঘ': 'N', 'ঙ': 'O', 'চ': 'P', 'ছ': 'Q', 'জ': 'R', 'ঝ': 'S', 'ঞ': 'T',
+                'ট': 'U', 'ঠ': 'V', 'ড': 'W', 'ঢ': 'X', 'ণ': 'Y', 'ত': 'Z', 'থ': '_', 'দ': 'd', 'ধ': 'e', 'ন': 'f',
+                'প': 'g', 'ফ': 'h', 'ব': 'i', 'ভ': 'j', 'ম': 'k', 'য': 'l', 'র': 'm', 'ল': 'n', 'শ': 'o', 'ষ': 'p',
+                'স': 'q', 'হ': 'r', 'ড়': 's', 'ঢ়': 't', 'য়': 'u', 'ৎ': 'v', 'ং': 'w', 'ঃ': 'x', 'ঁ': 'y',
+                'া': 'v', 'ি': 'i', 'ী': 'I', 'ু': 'u', 'ূ': 'U', 'ৃ': 'r', 'ে': 'e', 'ৈ': 'S', 'ো': 'ো', 'ৌ': 'O',
+                '্': '&', '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4', '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+            };
 
-            // Calling exact UnicodeToBijoy function from bijoy.js / unicode.js
-            if (typeof UnicodeToBijoy === 'function') {
-                bijoyOutput = UnicodeToBijoy(srcText);
-            } else if (typeof convertUnicodeToBijoy === 'function') {
-                bijoyOutput = convertUnicodeToBijoy(srcText);
-            } else if (typeof UnicodetoBijoy === 'function') {
-                bijoyOutput = UnicodetoBijoy(srcText);
-            } else {
-                alert('প্লাগইনের স্ক্রিপ্ট ফাইলগুলো সঠিকভাবে লোড হতে পারেনি!');
-                return;
+            // Basic conversion
+            var res = '';
+            for (var i = 0; i < src.length; i++) {
+                var ch = src[i];
+                res += map[ch] ? map[ch] : ch;
             }
-
-            document.getElementById('bijoy_text').value = bijoyOutput;
+            return res;
         }
 
-        // Event listeners
-        document.getElementById('convert_btn').addEventListener('click', processConversion);
-        document.getElementById('unicode_text').addEventListener('input', processConversion);
+        function runConversion() {
+            var src = document.getElementById('unicode_text').value;
+            
+            // Check if global script functions exist, otherwise use fallback
+            if (typeof convert2bijoy === 'function') {
+                document.getElementById('bijoy_text').value = convert2bijoy(src);
+            } else if (typeof UnicodeToBijoy === 'function') {
+                document.getElementById('bijoy_text').value = UnicodeToBijoy(src);
+            } else {
+                document.getElementById('bijoy_text').value = convertUnicodeToBijoy(src);
+            }
+        }
+
+        document.getElementById('convert_btn').addEventListener('click', runConversion);
+        document.getElementById('unicode_text').addEventListener('input', runConversion);
 
         document.getElementById('clear_btn').addEventListener('click', function() {
             document.getElementById('unicode_text').value = '';
             document.getElementById('bijoy_text').value = '';
         });
     </script>
+    
+    <!-- Load JS Files -->
+    <script src="config/js/unicode.js"></script>
+    <script src="config/js/bijoy.js"></script>
 </body>
 </html>
