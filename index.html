@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unicode to Bijoy Converter</title>
-    <!-- Tailwind CSS -->
+    <!-- CSS Files -->
     <link rel="stylesheet" href="config/css/tailwind.min.css">
     <link rel="stylesheet" href="config/css/main.css">
 </head>
@@ -29,22 +29,34 @@
         </div>
     </div>
 
-    <!-- JS Files -->
+    <!-- JS Files from your Zip -->
     <script src="config/js/unicode.js"></script>
     <script src="config/js/bijoy.js"></script>
 
-    <!-- Custom Script for Conversion -->
+    <!-- Custom Direct Working Logic -->
     <script>
-        document.getElementById('convert_btn').addEventListener('click', function() {
-            var src = document.getElementById('unicode_text').value;
-            if (typeof convertUnicodeToBijoy === 'function') {
-                document.getElementById('bijoy_text').value = convertUnicodeToBijoy(src);
+        function processConversion() {
+            var srcText = document.getElementById('unicode_text').value;
+            var bijoyOutput = '';
+
+            // Calling exact UnicodeToBijoy function from bijoy.js / unicode.js
+            if (typeof UnicodeToBijoy === 'function') {
+                bijoyOutput = UnicodeToBijoy(srcText);
+            } else if (typeof convertUnicodeToBijoy === 'function') {
+                bijoyOutput = convertUnicodeToBijoy(srcText);
             } else if (typeof UnicodetoBijoy === 'function') {
-                document.getElementById('bijoy_text').value = UnicodetoBijoy(src);
+                bijoyOutput = UnicodetoBijoy(srcText);
             } else {
-                alert('Conversion function not found!');
+                alert('প্লাগইনের স্ক্রিপ্ট ফাইলগুলো সঠিকভাবে লোড হতে পারেনি!');
+                return;
             }
-        });
+
+            document.getElementById('bijoy_text').value = bijoyOutput;
+        }
+
+        // Event listeners
+        document.getElementById('convert_btn').addEventListener('click', processConversion);
+        document.getElementById('unicode_text').addEventListener('input', processConversion);
 
         document.getElementById('clear_btn').addEventListener('click', function() {
             document.getElementById('unicode_text').value = '';
