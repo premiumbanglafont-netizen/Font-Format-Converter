@@ -127,14 +127,20 @@ select:focus{border-color:#75aef4;box-shadow:0 0 0 4px #eaf3ff}
 .css-head{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:16px 18px;border-bottom:1px solid var(--line)}
 .css-head h3{margin:0;font-size:18px}.css-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
 .css-guide{
-  padding:12px 18px;background:#eef6ff;border-bottom:1px solid var(--line);font-size:13px;line-height:1.5;color:#1a4971;
+  padding:14px 18px;background:#eef6ff;border-bottom:1px solid var(--line);font-size:14px;line-height:1.6;color:#144a75;
 }
 .css-guide ol{margin:6px 0 0;padding-left:18px}
-.css-guide li{margin-bottom:3px}
-#copyCss{border:0;background:var(--blue);color:#fff;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+.css-guide li{margin-bottom:4px}
+#copyCss{border:0;background:var(--blue);color:#fff;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;transition:.2s}
 #copyCss:hover{background:var(--blue-dark)}
 .css-code{margin:0;padding:18px;white-space:pre-wrap;word-break:break-word;overflow:auto;max-height:350px;background:#111827;color:#e5edf7;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}
-.copy-msg{padding:0 18px 12px;color:var(--ok);font-size:12px}
+
+/* Message styling for copy notice */
+.copy-msg{
+  display:none;padding:10px 18px;color:var(--ok);background:#ecf8f1;font-size:14px;font-weight:600;border-top:1px solid #cce8d7;transition:.3s
+}
+.copy-msg.show{display:block}
+
 .note{
   margin-top:20px;padding:15px 17px;background:#f6f8fa;border-radius:15px;color:#5d6b78;
   font-size:13px;line-height:1.6
@@ -154,7 +160,7 @@ footer{text-align:center;color:#7a8792;font-size:13px;padding:20px 8px}
 <body>
 <div class="app">
 
-  <!-- Custom Page Links (Ekhane aponar links add korun) -->
+  <!-- Custom Page Links -->
   <nav class="nav-bar">
     <a href="https://example.com" class="nav-link" target="_blank">Home</a>
     <a href="https://example.com/about" class="nav-link" target="_blank">About</a>
@@ -229,7 +235,7 @@ footer{text-align:center;color:#7a8792;font-size:13px;padding:20px 8px}
       <div id="previewText" class="preview-text">বাংলা ফন্ট ফরম্যাট কনভার্টার • যুক্তবর্ণ পরীক্ষা করুন</div>
     </section>
 
-    <!-- CSS Setup Panel with Instructions -->
+    <!-- Bangla Instruction CSS Panel -->
     <section id="cssPanel" class="css-panel" style="display:none">
       <div class="css-head">
         <div>
@@ -239,11 +245,11 @@ footer{text-align:center;color:#7a8792;font-size:13px;padding:20px 8px}
         <button id="copyCss" type="button">Copy CSS</button>
       </div>
       <div class="css-guide">
-        <strong>💡 কিভাবে সেটিং করবেন:</strong>
+        <strong>💡 ওয়েবসাইটে ফন্ট সেটআপ করার সহজ নিয়ম:</strong>
         <ol>
-          <li>ডাউনলোড করা ফন্ট ফাইলটি আপনার সার্ভার বা ওয়েবসাইটের <code>fonts/</code> ফোল্ডারে আপলোড করুন।</li>
-          <li>নিচের CSS Code-টি কপি করে আপনার CSS ফাইল বা HTML-এর <code>&lt;style&gt;</code> ট্যাগে বসিয়ে দিন।</li>
-          <li><code>url()</code> পাথটি আপনার সার্ভারের সঠিক ফাইল লোকেশন অনুযায়ী আপডেট করে নিন।</li>
+          <li>কনভার্ট করা ফন্ট ফাইলটি ডাউনলোড করে আপনার ওয়েব সার্ভারের (যেমন: <code>fonts/</code>) ফোল্ডারে আপলোড করুন।</li>
+          <li>নিচের CSS Code-টি কপি করে আপনার ওয়েবসাইটের CSS ফাইলের একদম উপরে যুক্ত করে দিন।</li>
+          <li><code>url("fonts/...")</code> অংশে আপনার ফন্ট ফাইলের সঠিক লিংক/পাথ বসিয়ে দিন।</li>
         </ol>
       </div>
       <pre id="cssCode" class="css-code"></pre>
@@ -367,6 +373,7 @@ await micropip.install(["fonttools", "brotli"])
   }
 }
 
+/* Bangla Comments inside Generated CSS */
 function makeCssCode(){
   if(!convertedName) return "";
   const family = convertedName.replace(/\.[^.]+$/,"").replace(/["\\]/g,"");
@@ -375,7 +382,7 @@ function makeCssCode(){
 
   let srcFormat = ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext;
 
-  return `/* Step 1: Upload '${fontUrl}' to your server (e.g. inside 'fonts/' folder) */
+  return `/* ধাপ ১: '${fontUrl}' ফাইলটি আপনার সার্ভারের 'fonts/' ফোল্ডারে আপলোড করুন */
 
 @font-face {
   font-family: "${family}";
@@ -385,13 +392,13 @@ function makeCssCode(){
   font-display: swap;
 }
 
-/* Step 2: Apply the font to your website elements */
+/* ধাপ ২: আপনার ওয়েবসাইটের টেক্সটে ফন্টটি ব্যবহার করুন */
 
 body {
   font-family: "${family}", sans-serif;
 }
 
-/* Or use for a specific class: */
+/* নির্দিষ্ট কোনো ক্লাসের জন্য ব্যবহার করতে চাইলে: */
 .custom-font {
   font-family: "${family}", sans-serif;
 }`;
@@ -400,7 +407,9 @@ body {
 function showCss(){
   $("cssCode").textContent = makeCssCode();
   $("cssPanel").style.display = "block";
-  $("copyMsg").textContent = "";
+  const msg = $("copyMsg");
+  msg.className = "copy-msg";
+  msg.textContent = "";
 }
 
 async function convertFont(){
@@ -478,15 +487,28 @@ len(open(out,"rb").read())
   }
 }
 
-$("copyCss").addEventListener("click",async()=>{
-  const code=$("cssCode").textContent;
-  try{
+/* Copy button click listener with display animation */
+$("copyCss").addEventListener("click", async () => {
+  const code = $("cssCode").textContent;
+  const copyBtn = $("copyCss");
+  const msgBox = $("copyMsg");
+
+  try {
     await navigator.clipboard.writeText(code);
-    $("copyMsg").textContent="CSS code copied.";
-  }catch(e){
-    $("copyMsg").textContent="Copy করা যায়নি। Code block থেকে manually copy করুন।";
+    copyBtn.textContent = "Copied!";
+    msgBox.textContent = "✓ CSS code সফলভাবে কপি হয়েছে!";
+    msgBox.classList.add("show");
+
+    setTimeout(() => {
+      copyBtn.textContent = "Copy CSS";
+      msgBox.classList.remove("show");
+    }, 3000);
+  } catch (e) {
+    msgBox.textContent = "⚠️ Copy করা যায়নি। Code block থেকে manually copy করুন।";
+    msgBox.classList.add("show");
   }
 });
+
 convert.addEventListener("click",convertFont);
 </script>
 </body>
