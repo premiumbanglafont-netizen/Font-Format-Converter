@@ -152,8 +152,8 @@ footer{text-align:center;color:#7a8792;font-size:13px;padding:20px 8px}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (max-width: 520px) {
   .nav-bar {
-    display: inline flow-root;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
     gap: 4px;
     overflow: visible;
   }
